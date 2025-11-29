@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "795895467969",
+    "project_id": "jna-a-2520d",
+    "storage_bucket": "jna-a-2520d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795895467969:android:f2460ab88dffdab412e940",
+        "android_client_info": {
+          "package_name": "com.example.klivjna_rebuild"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArsXe4V39Qifs2bb6grIKcwzzj1gV3C3E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795895467969:android:5171c16feda15d5112e940",
+        "android_client_info": {
+          "package_name": "com.example.reachapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArsXe4V39Qifs2bb6grIKcwzzj1gV3C3E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
