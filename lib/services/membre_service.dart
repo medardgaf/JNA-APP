@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 class MembreService {
   static const String baseUrl =
       "https://k.jnatg.org/api/membres/MembreController.php";
+  static const String exportUrl =
+      "https://k.jnatg.org/api/dashboard/export_membres.php";
 
   // =======================================================================
   //   MÉTHODES DE LECTURE (READ) - FORMAT NOUVEAU API
@@ -128,6 +130,7 @@ class MembreService {
     String? telephone,
     String? role,
     String? statut,
+    bool? estMembreBureau,
     String? dateDebutArriere,
     double? montantArriere,
   }) async {
@@ -143,6 +146,7 @@ class MembreService {
           "telephone": telephone,
           "role": role,
           "statut": statut,
+          "est_membre_bureau": estMembreBureau ?? false,
           "date_debut_arriere": dateDebutArriere,
           "montant_arriere": montantArriere,
         }),
@@ -178,6 +182,7 @@ class MembreService {
     String? telephone,
     String? role,
     String? statut,
+    bool? estMembreBureau,
     String? dateDebutArriere,
     double? montantArriere,
   }) async {
@@ -193,6 +198,7 @@ class MembreService {
           if (telephone != null) "telephone": telephone,
           if (role != null) "role": role,
           if (statut != null) "statut": statut,
+          if (estMembreBureau != null) "est_membre_bureau": estMembreBureau,
           if (dateDebutArriere != null) "date_debut_arriere": dateDebutArriere,
           if (montantArriere != null) "montant_arriere": montantArriere,
         }),
@@ -393,5 +399,32 @@ class MembreService {
       debugPrint("Erreur réseau MembreService.updateSoldeCredit: $e");
       return {"success": false, "message": "Erreur réseau: $e"};
     }
+  }
+
+  // =======================================================================
+  //   EXPORT
+  // =======================================================================
+
+  /// Retourne l'URL pour exporter tous les membres en CSV
+  ///
+  /// Cette URL peut être utilisée avec url_launcher pour ouvrir le navigateur
+  /// et télécharger le fichier CSV contenant tous les membres actifs
+  static String getExportUrl() {
+    return exportUrl;
+  }
+
+  /// Télécharge l'export des membres (retourne l'URL pour ouverture externe)
+  ///
+  /// Exemple d'utilisation avec url_launcher:
+  /// ```dart
+  /// import 'package:url_launcher/url_launcher.dart';
+  ///
+  /// final url = await MembreService.exportMembres();
+  /// if (await canLaunchUrl(Uri.parse(url))) {
+  ///   await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  /// }
+  /// ```
+  static Future<String> exportMembres() async {
+    return exportUrl;
   }
 }

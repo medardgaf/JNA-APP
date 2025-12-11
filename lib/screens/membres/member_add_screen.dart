@@ -18,6 +18,9 @@ class _MemberAddScreenState extends State<MemberAddScreen> {
   final roleCtrl = TextEditingController(text: 'membre');
   final statutCtrl = TextEditingController(text: 'actif');
 
+  // NOUVEAU : Champ pour membre du bureau
+  bool estMembreBureau = false;
+
   // CONTRÔLEURS POUR LES ARRÉRÉS
   final dateDebutArriereCtrl = TextEditingController();
   // SUPPRIMÉ : final statutArriereCtrl = TextEditingController(text: 'a_jour');
@@ -69,6 +72,7 @@ class _MemberAddScreenState extends State<MemberAddScreen> {
       telephone: telephoneCtrl.text,
       role: roleCtrl.text,
       statut: statutCtrl.text,
+      estMembreBureau: estMembreBureau, // NOUVEAU
       // CHAMPS CONSERVÉS
       dateDebutArriere:
           dateDebutArriereCtrl.text.isEmpty ? null : dateDebutArriereCtrl.text,
@@ -147,6 +151,25 @@ class _MemberAddScreenState extends State<MemberAddScreen> {
                   DropdownMenuItem(value: "inactif", child: Text("Inactif")),
                 ],
                 onChanged: (v) => statutCtrl.text = v!,
+              ),
+
+              // NOUVEAU : Checkbox pour membre du bureau
+              const SizedBox(height: 10),
+              CheckboxListTile(
+                title: const Text("Membre du Bureau"),
+                subtitle: const Text(
+                  "Cochez si ce membre fait partie du bureau de l'association",
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                value: estMembreBureau,
+                onChanged: (val) {
+                  setState(() {
+                    estMembreBureau = val ?? false;
+                  });
+                },
+                activeColor: Colors.blue,
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
               ),
 
               const SizedBox(height: 20),

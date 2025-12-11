@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-// Assure-toi que les imports correspondent à ton architecture de dossiers
 import 'package:kliv_app/screens/operations/add_unified_operation_screen.dart';
 import 'package:kliv_app/screens/arrieres/arrieres_screen.dart';
-import 'dart:io';
-import 'package:excel/excel.dart' hide Border;
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/foundation.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:device_info_plus/device_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../services/operations_services.dart';
 
 class OperationsScreen extends StatefulWidget {
@@ -233,114 +227,42 @@ class _OperationsScreenState extends State<OperationsScreen> {
 
   Future<void> exportToExcel() async {
     try {
-      final excel = Excel.createExcel();
-      final sheet = excel['Opérations'];
+      // Utiliser l'export CSV du backend au lieu de générer un fichier Excel local
+      final exportUrl = OperationService.getExportUrl();
 
-      sheet.appendRow([
-        'ID',
-        'Date',
-        'Type',
-        'Catégorie',
-        'Montant',
-        'Membre',
-        'Description'
-      ]);
+      // Ouvrir l'URL dans le navigateur pour télécharger le fichier
+      final uri = Uri.parse(exportUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
 
-      for (final op in _filteredOperations) {
-        // Formatage date
-        String dateStr = op['date_operation']?.toString() ?? '';
-        try {
-          if (dateStr.isNotEmpty) {
-            dateStr = DateFormat('dd/MM/yyyy').format(DateTime.parse(dateStr));
-          }
-        } catch (_) {}
-
-        final membreNom = (op['membre_nom'] != null)
-            ? "${op['membre_nom']} ${op['membre_prenom']}"
-            : "Général";
-
-        sheet.appendRow([
-          op['id'],
-          dateStr,
-          op['type'],
-          op['categorie_nom'],
-          op['montant'],
-          membreNom,
-          op['description']
-        ]);
-      }
-
-      // Vérification de la version Android (Uniquement si ce n'est pas le Web)
-      bool storagePermissionNeeded = true;
-      if (!kIsWeb && Platform.isAndroid) {
-        final androidInfo = await DeviceInfoPlugin().androidInfo;
-        if (androidInfo.version.sdkInt >= 33) {
-          storagePermissionNeeded =
-              false; // Pas besoin de WRITE_EXTERNAL_STORAGE sur Android 13+
-        }
-      } else if (kIsWeb) {
-        storagePermissionNeeded =
-            false; // Pas de permission de stockage sur le Web
-      } else {
-        storagePermissionNeeded = false; // iOS/Desktop
-      }
-
-      if (!kIsWeb && storagePermissionNeeded) {
-        final status = await Permission.storage.request();
-        if (!status.isGranted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Permission de stockage refusée")),
+            const SnackBar(
+              content: Text("Export lancé ! Le fichier CSV va se télécharger."),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
           );
-          return;
-        }
-      }
-
-      if (kIsWeb) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(
-                  "L'export sur Web n'est pas encore supporté dans cette version.")),
-        );
-        return;
-      }
-
-      Directory? dir;
-      if (Platform.isAndroid) {
-        if (!storagePermissionNeeded) {
-          dir = await getExternalStorageDirectory();
-        } else {
-          dir = Directory('/storage/emulated/0/Download');
-          if (!await dir.exists()) {
-            dir = await getExternalStorageDirectory();
-          }
         }
       } else {
-        dir = await getApplicationDocumentsDirectory();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Impossible d'ouvrir l'URL : $exportUrl"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
-
-      if (dir == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("Impossible d'accéder au dossier de stockage")),
-        );
-        return;
-      }
-
-      final filePath =
-          "${dir.path}/operations_export_${DateTime.now().millisecondsSinceEpoch}.xlsx";
-      final fileBytes = excel.encode();
-      final file = File(filePath);
-      await file.writeAsBytes(fileBytes!);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Export réussi : $filePath"),
-            duration: const Duration(seconds: 5)),
-      );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur export : ${e.toString()}")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Erreur export : ${e.toString()}"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

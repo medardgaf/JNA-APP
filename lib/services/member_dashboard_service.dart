@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'dart:convert';
 import '../utils/api.dart';
 

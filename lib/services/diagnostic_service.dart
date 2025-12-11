@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import '../utils/api.dart';
 
 class DiagnosticService {

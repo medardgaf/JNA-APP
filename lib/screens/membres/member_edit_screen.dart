@@ -26,6 +26,9 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
   late TextEditingController montantArriereCtrl;
   late TextEditingController dateDebutCotisationCtrl;
 
+  // NOUVEAU : Champ pour membre du bureau
+  bool estMembreBureau = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +54,10 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
         TextEditingController(text: m['montant_arriere']?.toString() ?? '0.0');
     dateDebutCotisationCtrl = TextEditingController(
         text: m['date_debut_cotisation']?.toString() ?? '');
+
+    // Initialiser estMembreBureau
+    estMembreBureau =
+        m['est_membre_bureau'] == true || m['est_membre_bureau'] == 1;
   }
 
   Future<void> _submit() async {
@@ -64,6 +71,7 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
       telephone: telephoneCtrl.text,
       role: roleCtrl.text,
       statut: statutCtrl.text,
+      estMembreBureau: estMembreBureau,
       dateDebutArriere:
           dateDebutArriereCtrl.text.isEmpty ? null : dateDebutArriereCtrl.text,
       montantArriere: double.tryParse(montantArriereCtrl.text),
@@ -287,6 +295,24 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
                 _buildDropdown(roleCtrl, "Rôle",
                     ["admin", "tresorier", "secretaire", "membre"]),
                 _buildDropdown(statutCtrl, "Statut", ["actif", "inactif"]),
+                // NOUVEAU : Checkbox pour membre du bureau
+                const SizedBox(height: 10),
+                CheckboxListTile(
+                  title: const Text("Membre du Bureau"),
+                  subtitle: const Text(
+                    "Cochez si ce membre fait partie du bureau de l'association",
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  value: estMembreBureau,
+                  onChanged: (val) {
+                    setState(() {
+                      estMembreBureau = val ?? false;
+                    });
+                  },
+                  activeColor: Colors.blue,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
               ]),
               const SizedBox(height: 12),
               _sectionCard("Gestion des arriérés", [

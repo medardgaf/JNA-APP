@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 class OperationService {
   static const String baseUrl =
       "https://k.jnatg.org/api/operations/OperationController.php";
+  static const String exportUrl =
+      "https://k.jnatg.org/api/dashboard/export_operations.php";
 
   // ==================== CRUD ====================
 
@@ -97,6 +99,29 @@ class OperationService {
       'date_debut_cotisation': dateDebutCotisation,
       'comptabiliser': comptabiliser,
     });
+  }
+
+  /// Retourne l'URL pour exporter toutes les opérations en CSV
+  ///
+  /// Cette URL peut être utilisée avec url_launcher pour ouvrir le navigateur
+  /// et télécharger le fichier CSV contenant toutes les opérations
+  static String getExportUrl() {
+    return exportUrl;
+  }
+
+  /// Télécharge l'export des opérations (retourne l'URL pour ouverture externe)
+  ///
+  /// Exemple d'utilisation avec url_launcher:
+  /// ```dart
+  /// import 'package:url_launcher/url_launcher.dart';
+  ///
+  /// final url = await OperationService.exportOperations();
+  /// if (await canLaunchUrl(Uri.parse(url))) {
+  ///   await launchUrl(Uri.parse(url));
+  /// }
+  /// ```
+  static Future<String> exportOperations() async {
+    return exportUrl;
   }
 
   static Future<Map<String, dynamic>> _getRequest(String action,
